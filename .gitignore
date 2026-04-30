@@ -1,0 +1,17 @@
+# Local env / secrets
+.env
+.env.*
+!.env.example
+
+# Tooling state
+.codex
+.codex/
+.serena/
+
+# Sub-repositories — managed independently in their own GitHub repos.
+back/
+front/
+
+# OS / editor
+.DS_Store
+*.swp
