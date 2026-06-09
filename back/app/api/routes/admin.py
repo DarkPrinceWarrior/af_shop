@@ -4,6 +4,7 @@ from datetime import date, datetime, time, timezone
 from pathlib import Path
 from typing import Annotated
 
+import httpx
 from fastapi import APIRouter, HTTPException, Query, UploadFile, WebSocket
 from fastapi.websockets import WebSocketDisconnect
 from sqlalchemy import or_
@@ -42,10 +43,14 @@ from app.models import (
     ProductPublic,
     ProductsPublic,
     ProductUpdate,
+    TelegramSettings,
+    TelegramSettingsPublic,
+    TelegramSettingsUpdate,
     get_datetime_utc,
 )
 from app.services.orders import cancel_order, complete_order, update_order_status
 from app.services.realtime import order_connection_manager
+from app.services.telegram import resolve_telegram_config, send_telegram_message
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -462,6 +467,69 @@ def complete_order_route(
         admin_user=admin,
         admin_comment=complete_in.admin_comment,
     )
+
+
+@router.get("/telegram-settings", response_model=TelegramSettingsPublic)
+def read_telegram_settings(
+    session: SessionDep,
+    _admin: SuperuserDep,
+) -> TelegramSettingsPublic:
+    row = session.get(TelegramSettings, 1)
+    token, chat_id, source = resolve_telegram_config(session)
+    return TelegramSettingsPublic(
+        bot_token=row.bot_token if row else None,
+        owner_chat_id=row.owner_chat_id if row else None,
+        enabled=row.enabled if row else True,
+        configured=bool(token and chat_id),
+        source=source,
+    )
+
+
+@router.put("/telegram-settings", response_model=TelegramSettingsPublic)
+def update_telegram_settings(
+    session: SessionDep,
+    _admin: SuperuserDep,
+    settings_in: TelegramSettingsUpdate,
+) -> TelegramSettingsPublic:
+    row = session.get(TelegramSettings, 1)
+    if row is None:
+        row = TelegramSettings(id=1)
+    for key, value in settings_in.model_dump(exclude_unset=True).items():
+        setattr(row, key, value)
+    row.updated_at = get_datetime_utc()
+    session.add(row)
+    session.commit()
+    session.refresh(row)
+    token, chat_id, source = resolve_telegram_config(session)
+    return TelegramSettingsPublic(
+        bot_token=row.bot_token,
+        owner_chat_id=row.owner_chat_id,
+        enabled=row.enabled,
+        configured=bool(token and chat_id),
+        source=source,
+    )
+
+
+@router.post("/telegram-settings/test", response_model=Message)
+def test_telegram_settings(
+    session: SessionDep,
+    _admin: SuperuserDep,
+) -> Message:
+    token, chat_id, _source = resolve_telegram_config(session)
+    if not token or not chat_id:
+        raise HTTPException(status_code=400, detail="Telegram is not configured")
+    try:
+        send_telegram_message(token, chat_id, "Shop Meraj: test notification ✅")
+    except httpx.HTTPStatusError as error:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Telegram API error: {error.response.status_code}",
+        ) from error
+    except httpx.RequestError as error:
+        raise HTTPException(
+            status_code=502, detail="Telegram request failed"
+        ) from error
+    return Message(message="Test message sent")
 
 
 @router.websocket("/orders/ws")

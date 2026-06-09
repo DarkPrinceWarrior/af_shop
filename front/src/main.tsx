@@ -21,6 +21,7 @@ import AdminProducts from '@/pages/admin/AdminProducts';
 import AdminCategories from '@/pages/admin/AdminCategories';
 import AdminDeliveryPlaces from '@/pages/admin/AdminDeliveryPlaces';
 import AdminUsers from '@/pages/admin/AdminUsers';
+import AdminTelegram from '@/pages/admin/AdminTelegram';
 import './styles/globals.css';
 
 const router = createBrowserRouter([
@@ -54,6 +55,7 @@ const router = createBrowserRouter([
           { path: 'categories', Component: AdminCategories },
           { path: 'delivery-places', Component: AdminDeliveryPlaces },
           { path: 'users', Component: AdminUsers },
+          { path: 'telegram', Component: AdminTelegram },
         ],
       },
     ],

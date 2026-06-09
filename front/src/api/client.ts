@@ -6,6 +6,8 @@ import type {
   AdminDeliveryPlacePayload,
   AdminProduct,
   AdminProductPayload,
+  AdminTelegramSettings,
+  AdminTelegramSettingsPayload,
   AdminUserPayload,
   AuthToken,
   AuthUser,
@@ -418,6 +420,38 @@ export async function uploadMedia(
   return request<MediaUploadResponse>('/admin/media/images', {
     method: 'POST',
     body: form,
+    token,
+  });
+}
+
+export function openAdminOrdersSocket(token: string): WebSocket {
+  const wsBase = API_BASE_URL.replace(/^http/i, 'ws');
+  const url = `${wsBase}${API_PREFIX}/admin/orders/ws?token=${encodeURIComponent(token)}`;
+  return new WebSocket(url);
+}
+
+export function fetchTelegramSettings(
+  token: string,
+): Promise<AdminTelegramSettings> {
+  return request<AdminTelegramSettings>('/admin/telegram-settings', { token });
+}
+
+export function updateTelegramSettings(
+  token: string,
+  payload: AdminTelegramSettingsPayload,
+): Promise<AdminTelegramSettings> {
+  return request<AdminTelegramSettings>('/admin/telegram-settings', {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+    token,
+  });
+}
+
+export function testTelegramSettings(
+  token: string,
+): Promise<{ message: string }> {
+  return request<{ message: string }>('/admin/telegram-settings/test', {
+    method: 'POST',
     token,
   });
 }

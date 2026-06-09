@@ -46,23 +46,49 @@ const sheetVariants = cva(
 
 interface SheetContentProps
   extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
+    VariantProps<typeof sheetVariants> {
+  description?: React.ReactNode;
+}
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   SheetContentProps
->(({ side = 'right', className, children, ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(sheetVariants({ side }), 'flex flex-col', className)}
-      {...props}
-    >
-      {children}
-    </DialogPrimitive.Content>
-  </SheetPortal>
-));
+>(
+  (
+    {
+      side = 'right',
+      className,
+      children,
+      description,
+      'aria-describedby': ariaDescribedBy,
+      ...props
+    },
+    ref,
+  ) => {
+    const autoId = React.useId();
+    // Provide an explicit aria-describedby (or undefined) so Radix does not warn
+    // about a missing Description when none is supplied.
+    const describedBy = description ? autoId : ariaDescribedBy;
+    return (
+      <SheetPortal>
+        <SheetOverlay />
+        <DialogPrimitive.Content
+          ref={ref}
+          aria-describedby={describedBy}
+          className={cn(sheetVariants({ side }), 'flex flex-col', className)}
+          {...props}
+        >
+          {description ? (
+            <SheetDescription id={autoId} className="sr-only">
+              {description}
+            </SheetDescription>
+          ) : null}
+          {children}
+        </DialogPrimitive.Content>
+      </SheetPortal>
+    );
+  },
+);
 SheetContent.displayName = DialogPrimitive.Content.displayName;
 
 function SheetHeader({

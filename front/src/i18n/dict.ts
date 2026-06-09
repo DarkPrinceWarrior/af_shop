@@ -130,6 +130,24 @@ export type TranslationKey =
   | 'admin.field.active'
   | 'admin.field.superuser'
   | 'admin.confirmDelete'
+  | 'admin.telegram'
+  | 'admin.telegram.title'
+  | 'admin.telegram.botToken'
+  | 'admin.telegram.chatId'
+  | 'admin.telegram.enabled'
+  | 'admin.telegram.hint'
+  | 'admin.telegram.tokenPlaceholder'
+  | 'admin.telegram.test'
+  | 'admin.telegram.testOk'
+  | 'admin.telegram.savedOk'
+  | 'admin.telegram.statusConfigured'
+  | 'admin.telegram.statusMissing'
+  | 'admin.live'
+  | 'admin.offline'
+  | 'admin.newOrders'
+  | 'admin.page.prev'
+  | 'admin.page.next'
+  | 'admin.page.range'
   | 'common.loading'
   | 'common.retry'
   | 'common.close'
@@ -263,6 +281,25 @@ const en: Dict = {
   'admin.field.active': 'Active',
   'admin.field.superuser': 'Superuser',
   'admin.confirmDelete': 'Delete this item?',
+  'admin.telegram': 'Telegram',
+  'admin.telegram.title': 'Telegram notifications',
+  'admin.telegram.botToken': 'Bot token',
+  'admin.telegram.chatId': 'Owner chat ID',
+  'admin.telegram.enabled': 'Send notifications',
+  'admin.telegram.hint':
+    'New orders are sent to this Telegram chat. Get a token from @BotFather and the chat ID from your bot.',
+  'admin.telegram.tokenPlaceholder': 'Leave blank to keep the current token',
+  'admin.telegram.test': 'Send test message',
+  'admin.telegram.testOk': 'Test message sent',
+  'admin.telegram.savedOk': 'Settings saved',
+  'admin.telegram.statusConfigured': 'Active',
+  'admin.telegram.statusMissing': 'Not configured',
+  'admin.live': 'Live',
+  'admin.offline': 'Reconnecting…',
+  'admin.newOrders': '{count} new — refresh',
+  'admin.page.prev': 'Previous',
+  'admin.page.next': 'Next',
+  'admin.page.range': '{from}–{to} of {total}',
   'common.loading': 'Loading…',
   'common.retry': 'Retry',
   'common.close': 'Close',
@@ -395,6 +432,25 @@ const ps: Dict = {
   'admin.field.active': 'فعال',
   'admin.field.superuser': 'سپر کاروونکی',
   'admin.confirmDelete': 'دا توکی ړنګ کړئ؟',
+  'admin.telegram': 'ټلیګرام',
+  'admin.telegram.title': 'د ټلیګرام خبرتیاوې',
+  'admin.telegram.botToken': 'د بوټ ټوکن',
+  'admin.telegram.chatId': 'د مالک چټ ID',
+  'admin.telegram.enabled': 'خبرتیاوې واستوئ',
+  'admin.telegram.hint':
+    'نوې سپارښتنې دې ټلیګرام چټ ته لېږل کېږي. ټوکن له @BotFather او د چټ ID له خپل بوټ څخه ترلاسه کړئ.',
+  'admin.telegram.tokenPlaceholder': 'د اوسني ټوکن ساتلو لپاره خالي پرېږدئ',
+  'admin.telegram.test': 'د ازموینې پیغام واستوئ',
+  'admin.telegram.testOk': 'د ازموینې پیغام ولېږل شو',
+  'admin.telegram.savedOk': 'تنظیمات خوندي شول',
+  'admin.telegram.statusConfigured': 'فعال',
+  'admin.telegram.statusMissing': 'نه دی تنظیم شوی',
+  'admin.live': 'ژوندی',
+  'admin.offline': 'بیا نښلول…',
+  'admin.newOrders': '{count} نوي — تازه کړئ',
+  'admin.page.prev': 'مخکینی',
+  'admin.page.next': 'راتلونکی',
+  'admin.page.range': '{from}–{to} له {total}',
   'common.loading': 'بارېږي…',
   'common.retry': 'بیا هڅه وکړئ',
   'common.close': 'بندول',
@@ -527,6 +583,25 @@ const zhCN: Dict = {
   'admin.field.active': '启用',
   'admin.field.superuser': '超级用户',
   'admin.confirmDelete': '确定删除？',
+  'admin.telegram': 'Telegram',
+  'admin.telegram.title': 'Telegram 通知',
+  'admin.telegram.botToken': '机器人 Token',
+  'admin.telegram.chatId': '所有者 Chat ID',
+  'admin.telegram.enabled': '发送通知',
+  'admin.telegram.hint':
+    '新订单会发送到此 Telegram 会话。从 @BotFather 获取 Token，从机器人获取 Chat ID。',
+  'admin.telegram.tokenPlaceholder': '留空以保留当前 Token',
+  'admin.telegram.test': '发送测试消息',
+  'admin.telegram.testOk': '测试消息已发送',
+  'admin.telegram.savedOk': '设置已保存',
+  'admin.telegram.statusConfigured': '已启用',
+  'admin.telegram.statusMissing': '未配置',
+  'admin.live': '实时',
+  'admin.offline': '重新连接…',
+  'admin.newOrders': '{count} 个新订单 — 刷新',
+  'admin.page.prev': '上一页',
+  'admin.page.next': '下一页',
+  'admin.page.range': '{from}–{to}，共 {total}',
   'common.loading': '加载中…',
   'common.retry': '重试',
   'common.close': '关闭',

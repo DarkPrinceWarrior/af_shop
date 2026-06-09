@@ -516,6 +516,33 @@ class MediaUploadPublic(SQLModel):
     image_path: str
 
 
+class TelegramSettings(SQLModel, table=True):
+    __tablename__ = "telegram_settings"
+
+    id: int = Field(default=1, primary_key=True)
+    bot_token: str | None = Field(default=None, max_length=255)
+    owner_chat_id: str | None = Field(default=None, max_length=64)
+    enabled: bool = Field(default=True)
+    updated_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+
+
+class TelegramSettingsUpdate(SQLModel):
+    bot_token: str | None = Field(default=None, max_length=255)
+    owner_chat_id: str | None = Field(default=None, max_length=64)
+    enabled: bool | None = None
+
+
+class TelegramSettingsPublic(SQLModel):
+    bot_token: str | None = None
+    owner_chat_id: str | None = None
+    enabled: bool = True
+    configured: bool = False
+    source: str = "none"
+
+
 class Message(SQLModel):
     message: str
 

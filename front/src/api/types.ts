@@ -293,3 +293,25 @@ export interface PasswordUpdatePayload {
   current_password: string;
   new_password: string;
 }
+
+export interface AdminTelegramSettings {
+  bot_token: string | null;
+  owner_chat_id: string | null;
+  enabled: boolean;
+  configured: boolean;
+  source: 'db' | 'env' | 'none';
+}
+
+export interface AdminTelegramSettingsPayload {
+  bot_token?: string | null;
+  owner_chat_id?: string | null;
+  enabled?: boolean;
+}
+
+export interface OrderCreatedEvent {
+  type: 'order.created';
+  order_id: string;
+  order_number: string;
+  total: string;
+  currency: CurrencyCode;
+}

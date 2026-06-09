@@ -6,6 +6,7 @@ import {
   Tag,
   MapPin,
   Users,
+  Send,
 } from 'lucide-react';
 import { useShop } from '@/state/useShop';
 import { RequireSuperuser } from '@/components/RouteGuards';
@@ -24,6 +25,7 @@ export default function AdminLayout() {
             { to: '/admin/categories', icon: Tag, label: t('admin.categories') },
             { to: '/admin/delivery-places', icon: MapPin, label: t('admin.deliveryPlaces') },
             { to: '/admin/users', icon: Users, label: t('admin.users') },
+            { to: '/admin/telegram', icon: Send, label: t('admin.telegram') },
           ]}
         />
         <div className="flex min-w-0 flex-col gap-4">

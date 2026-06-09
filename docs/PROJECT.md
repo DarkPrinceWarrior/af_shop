@@ -203,7 +203,7 @@ Alias `@/*` → `./src/*`.
 
 Таблицы БД (`public`): `category`, `product`, `product_image`,
 `delivery_place`, `shop_order`, `order_item`, `order_status_history`, `user`,
-`alembic_version`.
+`telegram_settings` (singleton настроек бота), `alembic_version`.
 
 | Сущность | Назначение | Ключевые поля |
 |---|---|---|
@@ -271,6 +271,8 @@ Alias `@/*` → `./src/*`.
 | GET/POST/PATCH/DELETE | `/admin/{products,categories,delivery-places}` | CRUD каталога |
 | POST | `/admin/products/{id}/images` | изображения товара |
 | POST | `/admin/media/images` | загрузка файла → `{ "image_path": "/media/images/..." }` |
+| GET/PUT | `/admin/telegram-settings` | настройки Telegram-бота (хранятся в БД, fallback на env) |
+| POST | `/admin/telegram-settings/test` | отправка тестового сообщения |
 | GET/POST/PATCH/DELETE | `/users/` | управление пользователями |
 
 ### Служебное
@@ -319,11 +321,17 @@ Alias `@/*` → `./src/*`.
 
 1. Вход (`/login` → `/admin` для суперпользователя).
 2. Дашборд: счётчики товаров, стока, новых и активных заказов.
-3. Realtime-список новых заказов (WebSocket) + Telegram-уведомление.
+3. **Realtime-заказы**: страница `/admin/orders` держит WebSocket-подключение
+   (индикатор «Live», авто-реконнект); при новом заказе показывается баннер
+   «N new — refresh». Список — с пагинацией (Prev/Next, диапазон из `count`),
+   фильтрами (статус, поиск, диапазон дат).
 4. Детали заказа, смена статуса, complete/cancel (с возвратом стока),
-   admin-комментарий.
+   admin-комментарий, история статусов.
 5. CRUD: товары (мультиязычные поля + загрузка фото), категории, места доставки,
    пользователи.
+6. **Настройки Telegram** (`/admin/telegram`): токен бота и chat ID хранятся в БД
+   (`telegram_settings`, fallback на env-переменные), переключатель уведомлений и
+   кнопка тестовой отправки.
 
 ---
 
