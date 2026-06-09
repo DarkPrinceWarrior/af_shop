@@ -1,17 +1,40 @@
-# Local env / secrets
+# ── Local env / secrets ──────────────────────────────────────────────
 .env
 .env.*
 !.env.example
 
-# Tooling state
+# ── Python / backend (back/) ─────────────────────────────────────────
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.cache/
+back/media/
+
+# ── Node / frontend (front/) ─────────────────────────────────────────
+node_modules/
+dist/
+.vite/
+coverage/
+playwright-report/
+playwright/.cache/
+*.log
+
+# ── Tooling state ────────────────────────────────────────────────────
 .codex
 .codex/
 .serena/
+.codegraph/
+.claude/
 
-# Sub-repositories — managed independently in their own GitHub repos.
-back/
-front/
+# ── Test artifacts ───────────────────────────────────────────────────
+test-results/
 
-# OS / editor
+# ── OS / editor ──────────────────────────────────────────────────────
 .DS_Store
 *.swp

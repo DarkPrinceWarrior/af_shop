@@ -59,7 +59,14 @@ curl -s http://localhost:8000/api/v1/utils/health-check/
 curl -sI http://localhost:5173 | head -1
 ```
 
-## Per-component docs
+## Docs
 
-- Backend: `back/README.md`, `back/AGENTS.md`, `back/docs/api_frontend.md`
-- Frontend: `front/README.md`, `front/CLAUDE.md`
+All project documentation is consolidated under `docs/`:
+
+- `docs/PROJECT.md` — full project reference (architecture, API, data model,
+  scenarios, config, testing).
+- `docs/backend/` — `api_frontend.md`, `product_spec.md`, `seed_data.md`.
+- `docs/frontend/` — `roadmap.md`, `screenshots/`, `demo-screenshots/`.
+
+Per-service quick refs: `back/README.md`, `back/AGENTS.md`, `front/README.md`,
+`front/CLAUDE.md`.
