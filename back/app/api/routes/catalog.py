@@ -1,10 +1,11 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Request
 from sqlmodel import col, func, or_, select
 
 from app.api.deps import CurrentUser, OptionalCurrentUser, SessionDep
+from app.core.limiter import limiter
 from app.models import (
     CatalogBootstrapPublic,
     CatalogCategoryPublic,
@@ -352,7 +353,9 @@ def read_my_order(
 
 
 @router.post("/orders", response_model=OrderPublic)
+@limiter.limit("20/minute")
 async def create_public_order(
+    request: Request,  # noqa: ARG001  (required by slowapi)
     session: SessionDep,
     background_tasks: BackgroundTasks,
     order_in: OrderCreate,

@@ -53,6 +53,8 @@ class Settings(BaseSettings):
     SENTRY_DSN: HttpUrl | None = None
     TELEGRAM_BOT_TOKEN: str | None = None
     TELEGRAM_OWNER_CHAT_ID: str | None = None
+    # Optional Redis URL; enables cross-worker realtime order broadcasts.
+    REDIS_URL: str | None = None
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str

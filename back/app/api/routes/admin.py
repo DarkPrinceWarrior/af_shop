@@ -1,4 +1,3 @@
-import shutil
 import uuid
 from datetime import date, datetime, time, timezone
 from pathlib import Path
@@ -54,6 +53,8 @@ from app.services.telegram import resolve_telegram_config, send_telegram_message
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+MAX_UPLOAD_BYTES = 5 * 1024 * 1024  # 5 MB
+
 
 def _save_upload_file(*, upload_file: UploadFile, folder: str) -> str:
     if not upload_file.content_type or not upload_file.content_type.startswith("image/"):
@@ -67,8 +68,17 @@ def _save_upload_file(*, upload_file: UploadFile, folder: str) -> str:
     target_dir.mkdir(parents=True, exist_ok=True)
     filename = f"{uuid.uuid4().hex}{suffix}"
     target_path = target_dir / filename
+    written = 0
     with target_path.open("wb") as buffer:
-        shutil.copyfileobj(upload_file.file, buffer)
+        while chunk := upload_file.file.read(1024 * 1024):
+            written += len(chunk)
+            if written > MAX_UPLOAD_BYTES:
+                buffer.close()
+                target_path.unlink(missing_ok=True)
+                raise HTTPException(
+                    status_code=413, detail="Image too large (max 5 MB)"
+                )
+            buffer.write(chunk)
     return f"{settings.MEDIA_URL.rstrip('/')}/{folder}/{filename}"
 
 

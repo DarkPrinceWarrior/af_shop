@@ -1,0 +1,134 @@
+# Production stack: Postgres + FastAPI + SPA behind Caddy (auto-HTTPS),
+# with scheduled database backups. Nothing but Caddy is exposed to the host.
+#
+#   cp .env.prod.example .env        # set DOMAIN, ACME_EMAIL and the secrets
+#   docker compose -f compose.prod.yaml up --build -d
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./back
+    image: shop-meraj-backend:prod
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      PROJECT_NAME: ${PROJECT_NAME:-Shop Meraj}
+      ENVIRONMENT: production
+      FRONTEND_HOST: https://${DOMAIN:?Set DOMAIN}
+      BACKEND_CORS_ORIGINS: https://${DOMAIN}
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY}
+      FIRST_SUPERUSER: ${FIRST_SUPERUSER:?Set FIRST_SUPERUSER}
+      FIRST_SUPERUSER_PASSWORD: ${FIRST_SUPERUSER_PASSWORD:?Set FIRST_SUPERUSER_PASSWORD}
+      POSTGRES_SERVER: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      MEDIA_ROOT: /app/media
+      MEDIA_URL: /media
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_OWNER_CHAT_ID: ${TELEGRAM_OWNER_CHAT_ID:-}
+      SHOP_SEED_FILE: ${SHOP_SEED_FILE:-}
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - media_data:/app/media
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/utils/health-check/', timeout=5).read()",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    command:
+      - bash
+      - -c
+      - bash scripts/prestart.sh && fastapi run --host 0.0.0.0 --port 8000 app/main.py
+
+  frontend:
+    build:
+      context: ./front
+      args:
+        # Empty base → the SPA calls the API same-origin (Caddy proxies /api).
+        VITE_API_BASE_URL: ""
+    image: shop-meraj-front:prod
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  db-backup:
+    image: prodrigestivill/postgres-backup-local:17
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SCHEDULE: "@daily"
+      BACKUP_KEEP_DAYS: 7
+      BACKUP_KEEP_WEEKS: 4
+      BACKUP_KEEP_MONTHS: 6
+      HEALTHCHECK_PORT: 8080
+    volumes:
+      - db_backups:/backups
+
+volumes:
+  postgres_data:
+  media_data:
+  caddy_data:
+  caddy_config:
+  db_backups:

@@ -40,4 +40,13 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 WORKDIR /app/
 
+# Run as a non-root user. The media dir is owned by the app user so uploads work
+# when the media volume is initialised from the image on first run.
+RUN groupadd --system app \
+    && useradd --system --gid app --home-dir /app app \
+    && mkdir -p /app/media \
+    && chown -R app:app /app
+
+USER app
+
 CMD ["fastapi", "run", "--workers", "4", "app/main.py"]

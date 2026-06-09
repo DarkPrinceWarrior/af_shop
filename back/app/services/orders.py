@@ -2,6 +2,7 @@ import uuid
 from decimal import Decimal
 
 from fastapi import HTTPException
+from sqlalchemy import update
 from sqlmodel import Session, select
 
 from app.models import (
@@ -140,8 +141,21 @@ def create_order_from_cart(
 
     for item_in in order_in.items:
         product = products_by_id[item_in.product_id]
-        product.stock_quantity -= item_in.quantity
-        session.add(product)
+        # Atomic, concurrency-safe stock decrement: the UPDATE only succeeds when
+        # enough stock remains, so concurrent orders cannot oversell the last unit.
+        result = session.execute(
+            update(Product)
+            .where(
+                Product.id == product.id,
+                Product.stock_quantity >= item_in.quantity,
+            )
+            .values(stock_quantity=Product.stock_quantity - item_in.quantity)
+        )
+        if result.rowcount != 1:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Not enough stock for product {product.id}",
+            )
         unit_price = _money_for_currency(
             currency=order_in.currency,
             afn=product.price_afn,

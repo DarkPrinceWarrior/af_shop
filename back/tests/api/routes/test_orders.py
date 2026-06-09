@@ -2,7 +2,10 @@ import uuid
 from decimal import Decimal
 from unittest.mock import patch
 
+import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
 from app.core.config import settings
@@ -356,6 +359,44 @@ def test_cancelled_order_cannot_be_completed(
         json={"admin_comment": "Cannot complete"},
     )
     assert complete_response.status_code == 409
+
+
+def test_order_cannot_oversell_stock(
+    client: TestClient,
+    db: Session,
+) -> None:
+    product, delivery_place = _create_shop_data(db, stock_quantity=1)
+
+    # First order takes the only unit.
+    _create_order(client, product=product, delivery_place=delivery_place, quantity=1)
+
+    # Second order for the now-empty stock must be rejected, not oversell.
+    with patch("app.api.routes.catalog.send_order_notification"):
+        response = client.post(
+            f"{settings.API_V1_STR}/catalog/orders",
+            json=_order_payload(
+                product=product, delivery_place=delivery_place, quantity=1
+            ),
+        )
+    assert response.status_code == 409
+
+    db.expire_all()
+    updated_product = db.get(Product, product.id)
+    assert updated_product
+    assert updated_product.stock_quantity == 0  # never negative
+
+
+def test_stock_check_constraint_rejects_negative(db: Session) -> None:
+    product, _ = _create_shop_data(db, stock_quantity=1)
+    try:
+        with pytest.raises(IntegrityError):
+            db.execute(
+                text("UPDATE product SET stock_quantity = -1 WHERE id = :pid"),
+                {"pid": str(product.id)},
+            )
+            db.commit()
+    finally:
+        db.rollback()
 
 
 def test_admin_orders_can_filter_by_status_and_search(

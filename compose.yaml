@@ -17,6 +17,16 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: shop-meraj-redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./back
@@ -26,6 +36,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
     environment:
       PROJECT_NAME: ${PROJECT_NAME:-Shop Meraj}
       ENVIRONMENT: ${ENVIRONMENT:-local}
@@ -52,6 +64,7 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_OWNER_CHAT_ID: ${TELEGRAM_OWNER_CHAT_ID:-}
       SHOP_SEED_FILE: ${SHOP_SEED_FILE:-}
+      REDIS_URL: redis://redis:6379/0
     ports:
       - "8000:8000"
     volumes:

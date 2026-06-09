@@ -4,7 +4,7 @@ from decimal import Decimal
 from enum import Enum
 
 from pydantic import EmailStr
-from sqlalchemy import DateTime, Numeric, String
+from sqlalchemy import CheckConstraint, DateTime, Numeric, String
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -156,6 +156,12 @@ class ProductBase(LocalizedNameMixin, LocalizedDescriptionMixin, MoneyMixin):
 
 
 class Product(ProductBase, table=True):
+    __table_args__ = (
+        CheckConstraint(
+            "stock_quantity >= 0", name="ck_product_stock_non_negative"
+        ),
+    )
+
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,

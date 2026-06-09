@@ -1,27 +1,33 @@
-import { StrictMode } from 'react';
+import { StrictMode, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import { ShopProvider } from '@/state/store';
 import { AuthProvider } from '@/state/auth';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import Layout from '@/Layout';
 import CatalogPage from '@/pages/CatalogPage';
 import CheckoutPage from '@/pages/CheckoutPage';
 import SuccessPage from '@/pages/SuccessPage';
 import LoginPage from '@/pages/LoginPage';
-import AccountLayout from '@/layouts/AccountLayout';
-import AccountHome from '@/pages/account/AccountHome';
-import AccountOrders from '@/pages/account/AccountOrders';
-import AccountOrderDetail from '@/pages/account/AccountOrderDetail';
-import AccountProfile from '@/pages/account/AccountProfile';
-import AdminLayout from '@/layouts/AdminLayout';
-import AdminDashboard from '@/pages/admin/AdminDashboard';
-import AdminOrders from '@/pages/admin/AdminOrders';
-import AdminOrderDetail from '@/pages/admin/AdminOrderDetail';
-import AdminProducts from '@/pages/admin/AdminProducts';
-import AdminCategories from '@/pages/admin/AdminCategories';
-import AdminDeliveryPlaces from '@/pages/admin/AdminDeliveryPlaces';
-import AdminUsers from '@/pages/admin/AdminUsers';
-import AdminTelegram from '@/pages/admin/AdminTelegram';
+
+// Auth recovery and the authenticated account/admin areas are code-split so they
+// stay out of the initial storefront bundle.
+const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
+const AccountLayout = lazy(() => import('@/layouts/AccountLayout'));
+const AccountHome = lazy(() => import('@/pages/account/AccountHome'));
+const AccountOrders = lazy(() => import('@/pages/account/AccountOrders'));
+const AccountOrderDetail = lazy(() => import('@/pages/account/AccountOrderDetail'));
+const AccountProfile = lazy(() => import('@/pages/account/AccountProfile'));
+const AdminLayout = lazy(() => import('@/layouts/AdminLayout'));
+const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'));
+const AdminOrders = lazy(() => import('@/pages/admin/AdminOrders'));
+const AdminOrderDetail = lazy(() => import('@/pages/admin/AdminOrderDetail'));
+const AdminProducts = lazy(() => import('@/pages/admin/AdminProducts'));
+const AdminCategories = lazy(() => import('@/pages/admin/AdminCategories'));
+const AdminDeliveryPlaces = lazy(() => import('@/pages/admin/AdminDeliveryPlaces'));
+const AdminUsers = lazy(() => import('@/pages/admin/AdminUsers'));
+const AdminTelegram = lazy(() => import('@/pages/admin/AdminTelegram'));
 import './styles/globals.css';
 
 const router = createBrowserRouter([
@@ -32,6 +38,8 @@ const router = createBrowserRouter([
       { index: true, Component: CatalogPage },
       { path: 'checkout', Component: CheckoutPage },
       { path: 'login', Component: LoginPage },
+      { path: 'forgot-password', Component: ForgotPasswordPage },
+      { path: 'reset-password', Component: ResetPasswordPage },
       { path: 'orders/me', element: <Navigate to="/account/orders" replace /> },
       { path: 'orders/:orderNumber/success', Component: SuccessPage },
       {
@@ -69,10 +77,12 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    <AuthProvider>
-      <ShopProvider>
-        <RouterProvider router={router} />
-      </ShopProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <ShopProvider>
+          <RouterProvider router={router} />
+        </ShopProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   </StrictMode>,
 );

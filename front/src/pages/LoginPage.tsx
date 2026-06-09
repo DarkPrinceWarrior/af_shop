@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useAuth } from '@/state/useAuth';
 import { useShop } from '@/state/useShop';
 import { AuthPanel } from '@/components/features/auth/AuthPanel';
@@ -27,6 +27,12 @@ export default function LoginPage() {
         {t('auth.loginTitle')}
       </h1>
       <AuthPanel hideGuest />
+      <Link
+        to="/forgot-password"
+        className="self-center text-sm text-muted-foreground underline-offset-4 hover:underline"
+      >
+        {t('auth.forgotPassword')}
+      </Link>
     </div>
   );
 }

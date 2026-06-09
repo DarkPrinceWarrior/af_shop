@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
+import { Loader2 } from 'lucide-react';
 import { useShop } from '@/state/useShop';
 import { TopBar } from '@/components/features/layout/TopBar';
 import { CartDrawer } from '@/components/features/cart/CartDrawer';
@@ -29,7 +30,15 @@ export default function Layout() {
     <div className="flex min-h-full flex-col">
       <TopBar cartCount={cartCount} onOpenCart={() => setCartOpen(true)} />
       <main className="mx-auto grid w-full max-w-[1200px] flex-1 gap-6 px-5 py-6 md:grid-cols-[240px_minmax(0,1fr)] md:items-start">
-        <Outlet />
+        <Suspense
+          fallback={
+            <div className="col-span-full flex items-center justify-center py-20">
+              <Loader2 className="size-6 animate-spin text-primary" />
+            </div>
+          }
+        >
+          <Outlet />
+        </Suspense>
       </main>
       <CartDrawer
         open={cartOpen}

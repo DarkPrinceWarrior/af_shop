@@ -67,6 +67,16 @@ export type TranslationKey =
   | 'auth.haveAccount'
   | 'auth.noAccount'
   | 'auth.myOrders'
+  | 'auth.forgotPassword'
+  | 'auth.forgotTitle'
+  | 'auth.forgotHint'
+  | 'auth.sendResetLink'
+  | 'auth.recoverySent'
+  | 'auth.resetTitle'
+  | 'auth.resetSubmit'
+  | 'auth.resetDone'
+  | 'auth.backToLogin'
+  | 'auth.resetInvalid'
   | 'myOrders.title'
   | 'myOrders.empty'
   | 'myOrders.created'
@@ -218,6 +228,16 @@ const en: Dict = {
   'auth.haveAccount': 'Already have an account? Sign in',
   'auth.noAccount': "Don't have an account? Sign up",
   'auth.myOrders': 'My orders',
+  'auth.forgotPassword': 'Forgot password?',
+  'auth.forgotTitle': 'Reset your password',
+  'auth.forgotHint': "Enter your email and we'll send you a reset link.",
+  'auth.sendResetLink': 'Send reset link',
+  'auth.recoverySent': 'If that email is registered, a reset link has been sent.',
+  'auth.resetTitle': 'Set a new password',
+  'auth.resetSubmit': 'Update password',
+  'auth.resetDone': 'Password updated. You can sign in now.',
+  'auth.backToLogin': 'Back to sign in',
+  'auth.resetInvalid': 'This reset link is invalid or has expired.',
   'myOrders.title': 'My orders',
   'myOrders.empty': 'No orders yet.',
   'myOrders.created': 'Created',
@@ -369,6 +389,16 @@ const ps: Dict = {
   'auth.haveAccount': 'مخکې حساب لرئ؟ ننوتل',
   'auth.noAccount': 'حساب نه لرئ؟ نوي جوړ کړئ',
   'auth.myOrders': 'زما سپارښتنې',
+  'auth.forgotPassword': 'پاسورډ مو هیر شو؟',
+  'auth.forgotTitle': 'پاسورډ بیا تنظیم کړئ',
+  'auth.forgotHint': 'خپل ایمیل ولیکئ، موږ به تاسو ته د بیا تنظیم لینک واستوو.',
+  'auth.sendResetLink': 'د بیا تنظیم لینک واستوئ',
+  'auth.recoverySent': 'که دا ایمیل ثبت وي، د بیا تنظیم لینک ولېږل شو.',
+  'auth.resetTitle': 'نوی پاسورډ وټاکئ',
+  'auth.resetSubmit': 'پاسورډ تازه کړئ',
+  'auth.resetDone': 'پاسورډ تازه شو. اوس ننوتلی شئ.',
+  'auth.backToLogin': 'ننوتلو ته بېرته',
+  'auth.resetInvalid': 'دا لینک ناسم یا پای ته رسېدلی دی.',
   'myOrders.title': 'زما سپارښتنې',
   'myOrders.empty': 'لا تر اوسه هېڅ سپارښتنه نشته.',
   'myOrders.created': 'نېټه',
@@ -520,6 +550,16 @@ const zhCN: Dict = {
   'auth.haveAccount': '已有账号？去登录',
   'auth.noAccount': '没有账号？注册',
   'auth.myOrders': '我的订单',
+  'auth.forgotPassword': '忘记密码？',
+  'auth.forgotTitle': '重置密码',
+  'auth.forgotHint': '输入您的邮箱，我们将发送重置链接。',
+  'auth.sendResetLink': '发送重置链接',
+  'auth.recoverySent': '如果该邮箱已注册，重置链接已发送。',
+  'auth.resetTitle': '设置新密码',
+  'auth.resetSubmit': '更新密码',
+  'auth.resetDone': '密码已更新，现在可以登录。',
+  'auth.backToLogin': '返回登录',
+  'auth.resetInvalid': '此重置链接无效或已过期。',
   'myOrders.title': '我的订单',
   'myOrders.empty': '暂无订单。',
   'myOrders.created': '创建时间',

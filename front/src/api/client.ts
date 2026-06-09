@@ -152,6 +152,25 @@ export function fetchCurrentUser(token: string): Promise<AuthUser> {
   return request<AuthUser>('/users/me', { token });
 }
 
+export function requestPasswordRecovery(
+  email: string,
+): Promise<{ message: string }> {
+  return request<{ message: string }>(
+    `/password-recovery/${encodeURIComponent(email)}`,
+    { method: 'POST' },
+  );
+}
+
+export function resetPassword(
+  token: string,
+  new_password: string,
+): Promise<{ message: string }> {
+  return request<{ message: string }>('/reset-password/', {
+    method: 'POST',
+    body: JSON.stringify({ token, new_password }),
+  });
+}
+
 export function fetchMyOrders(token: string): Promise<OrdersList> {
   return request<OrdersList>('/catalog/orders/me', { token });
 }
@@ -425,7 +444,10 @@ export async function uploadMedia(
 }
 
 export function openAdminOrdersSocket(token: string): WebSocket {
-  const wsBase = API_BASE_URL.replace(/^http/i, 'ws');
+  // Fall back to the current origin when the API base is relative (same-origin
+  // deployment behind a reverse proxy); WebSocket requires an absolute URL.
+  const base = API_BASE_URL || window.location.origin;
+  const wsBase = base.replace(/^http/i, 'ws');
   const url = `${wsBase}${API_PREFIX}/admin/orders/ws?token=${encodeURIComponent(token)}`;
   return new WebSocket(url);
 }

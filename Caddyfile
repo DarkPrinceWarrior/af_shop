@@ -1,0 +1,24 @@
+# Production reverse proxy with automatic HTTPS (Let's Encrypt).
+# Serves the SPA same-origin and proxies the API + media to the backend, so the
+# browser never talks cross-origin and TLS terminates here.
+
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# API (REST + WebSocket) and uploaded media go to the backend.
+	handle /api/* {
+		reverse_proxy backend:8000
+	}
+	handle /media/* {
+		reverse_proxy backend:8000
+	}
+
+	# Everything else is the static SPA (nginx already sets security headers).
+	handle {
+		reverse_proxy frontend:80
+	}
+}
